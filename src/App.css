@@ -154,10 +154,34 @@ body {
 }
 
 .playlister-song, .playlister-song-dragged-to { 
-  display:flex;
+  /* display:flex;
   align-items: center;
   font-size: 24pt;
-  height:20%;
+  height:20%; */
+
+  font-size: 32pt;
+  margin: 10px;
+  padding: 20px;
+  border-radius: 25px;
+
+  /* background-color: var(--swatch-accent);
+  color: white; */
+}
+
+.playlister-song {
+  background-color: var(--swatch-complement);
+  /* color: white; */
+}
+
+.playlister-song-dragged-to {
+  /* background-color: var(--swatch-contrast); */
+  background-color: var(--swatch-complement);
+  /* color: white; */
+}
+
+.playlister-song:hover, .playlister-song-dragged-to:hover {
+  background-color: var(--swatch-contrast);
+  color: white;
 }
 
 input {
