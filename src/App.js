@@ -10,6 +10,7 @@ import MoveSong_Transaction from './transactions/MoveSong_Transaction.js';
 
 // THESE REACT COMPONENTS ARE MODALS
 import DeleteListModal from './components/DeleteListModal.js';
+import EditSongModal from './components/EditSongModal.js';
 
 // THESE REACT COMPONENTS ARE IN OUR UI
 import Banner from './components/Banner.js';
@@ -134,6 +135,14 @@ class App extends React.Component {
             this.deleteList(this.state.currentList.key);
         }
     }
+
+    editSongData = (newSongData) => {
+        if (newSongData !== undefined) {
+            
+        }
+        this.hideEditSongModal();
+    }
+
     renameList = (key, newName) => {
         let newKeyNamePairs = [...this.state.sessionData.keyNamePairs];
         // NOW GO THROUGH THE ARRAY AND FIND THE ONE TO RENAME
@@ -263,6 +272,14 @@ class App extends React.Component {
             this.showDeleteListModal();
         });
     }
+    markSongForEditing = (index, currentSongProps) => {
+        this.setState(prevState => ({
+            currentSongData: {index, currentSongProps}
+        }), () => {
+            // PROMPT THE USER
+            this.showEditSongModal();
+        });
+    }
     // THIS FUNCTION SHOWS THE MODAL FOR PROMPTING THE USER
     // TO SEE IF THEY REALLY WANT TO DELETE THE LIST
     showDeleteListModal() {
@@ -274,6 +291,17 @@ class App extends React.Component {
         let modal = document.getElementById("delete-list-modal");
         modal.classList.remove("is-visible");
     }
+
+    showEditSongModal() {
+        const modal = document.getElementById("edit-song-modal");
+        modal.classList.add("is-visible");
+    }
+
+    hideEditSongModal() {
+        const modal = document.getElementById("edit-song-modal");
+        modal.classList.remove("is-visible");
+    }
+
     render() {
         let canAddSong = this.state.currentList !== null;
         let canUndo = this.tps.hasTransactionToUndo();
@@ -303,13 +331,19 @@ class App extends React.Component {
                 />
                 <PlaylistCards
                     currentList={this.state.currentList}
-                    moveSongCallback={this.addMoveSongTransaction} />
+                    moveSongCallback={this.addMoveSongTransaction}
+                    editSongCallback={this.markSongForEditing} />
                 <Statusbar 
                     currentList={this.state.currentList} />
                 <DeleteListModal
                     listKeyPair={this.state.listKeyPairMarkedForDeletion}
                     hideDeleteListModalCallback={this.hideDeleteListModal}
                     deleteListCallback={this.deleteMarkedList}
+                />
+                <EditSongModal
+                    // listKeyPair={this.state.listKeyPairMarkedForDeletion}
+                    // hideEditSongModalCallback={this.hideEditSongModal}
+                    editSongDataCallback={this.editSongData}
                 />
             </div>
         );

@@ -54,6 +54,13 @@ export default class SongCard extends React.Component {
         this.props.moveCallback(sourceId, targetId);
     }
 
+    handleDoubleClick = (event) => {
+        event.preventDefault();
+        let target = event.target;
+        let targetId = target.id;
+        this.props.editCallback(this.getItemNum(), this.props.song);
+    };
+
     getItemNum = () => {
         return this.props.id.substring("playlist-song-".length);
     }
@@ -75,6 +82,7 @@ export default class SongCard extends React.Component {
                 onDragEnter={this.handleDragEnter}
                 onDragLeave={this.handleDragLeave}
                 onDrop={this.handleDrop}
+                onDoubleClick={this.handleDoubleClick}
                 draggable="true"
             >
                 {num}: <a href={`https://www.youtube.com/watch?v=${song.youTubeId}`}>{song.title} by {song.artist}</a>
