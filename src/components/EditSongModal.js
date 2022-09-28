@@ -7,7 +7,7 @@ export default class EditSongModal extends Component {
         // if (listKeyPair) {
         //     name = listKeyPair.name;
         // }
-        const {editSongDataCallback} = this.props;
+        const {editSongDataCallback, hideEditSongModalCallback} = this.props;
         return (
             <div 
                 className="modal" 
@@ -26,12 +26,12 @@ export default class EditSongModal extends Component {
                             <input type="button" 
                                 id="edit-song-confirm-button" 
                                 className="modal-button" 
-                                // onClick={deleteListCallback}
+                                onClick={editSongDataCallback}
                                 value='Confirm' />
                             <input type="button" 
                                 id="edit-song-cancel-button" 
                                 className="modal-button" 
-                                // onClick={hideDeleteListModalCallback}
+                                onClick={hideEditSongModalCallback}
                                 value='Cancel' />
                         </div>
                     </div>

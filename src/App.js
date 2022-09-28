@@ -7,6 +7,7 @@ import jsTPS from './common/jsTPS.js';
 
 // OUR TRANSACTIONS
 import MoveSong_Transaction from './transactions/MoveSong_Transaction.js';
+import EditSong_Transaction from './transactions/EditSong_Transaction.js';
 
 // THESE REACT COMPONENTS ARE MODALS
 import DeleteListModal from './components/DeleteListModal.js';
@@ -136,13 +137,6 @@ class App extends React.Component {
         }
     }
 
-    editSongData = (newSongData) => {
-        if (newSongData !== undefined) {
-            
-        }
-        this.hideEditSongModal();
-    }
-
     renameList = (key, newName) => {
         let newKeyNamePairs = [...this.state.sessionData.keyNamePairs];
         // NOW GO THROUGH THE ARRAY AND FIND THE ONE TO RENAME
@@ -239,11 +233,26 @@ class App extends React.Component {
         }
         this.setStateWithUpdatedList(list);
     }
+
+    editSongData = (index, newSongData) => {
+        let list = this.state.currentList;
+        console.log("EDIT");
+        console.log(list.songs);
+        this.setStateWithUpdatedList(list);
+        this.hideEditSongModal();
+    }
+
     // THIS FUNCTION ADDS A MoveSong_Transaction TO THE TRANSACTION STACK
     addMoveSongTransaction = (start, end) => {
         let transaction = new MoveSong_Transaction(this, start, end);
         this.tps.addTransaction(transaction);
     }
+
+    addEditSongTransaction = (songIndex, newSongObject) => {
+        const transaction = new EditSong_Transaction(this, songIndex, this.state.currentList[songIndex], newSongObject);
+        this.tps.addTransaction(transaction);
+    }
+
     // THIS FUNCTION BEGINS THE PROCESS OF PERFORMING AN UNDO
     undo = () => {
         if (this.tps.hasTransactionToUndo()) {
@@ -342,8 +351,8 @@ class App extends React.Component {
                 />
                 <EditSongModal
                     // listKeyPair={this.state.listKeyPairMarkedForDeletion}
-                    // hideEditSongModalCallback={this.hideEditSongModal}
-                    editSongDataCallback={this.editSongData}
+                    hideEditSongModalCallback={this.hideEditSongModal}
+                    editSongDataCallback={this.addEditSongTransaction}
                 />
             </div>
         );
