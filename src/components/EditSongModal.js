@@ -7,7 +7,8 @@ export default class EditSongModal extends Component {
         // if (listKeyPair) {
         //     name = listKeyPair.name;
         // }
-        const {editSongDataCallback, hideEditSongModalCallback} = this.props;
+        const {editSongDataCallback, hideEditSongModalCallback, editingSongData} = this.props;
+        const {currentSongProps: song, index} = editingSongData ?? {};
         return (
             <div 
                 className="modal" 
@@ -19,11 +20,11 @@ export default class EditSongModal extends Component {
                         </div>
                         <div className="modal-center" id="edit-modal-inputs">
                             <div id="edit-song-title-text-div">Title: </div>
-                            <input type="text" id="edit-song-title-text" className="modal-textfield" />
+                            <input type="text" id="edit-song-title-text" className="modal-textfield" defaultValue={song?.title ?? ""} />
                             <div id="edit-song-artist-text-div">Artist: </div>
-                            <input type="text" id="edit-song-artist-text" className="modal-textfield" />
+                            <input type="text" id="edit-song-artist-text" className="modal-textfield" defaultValue={song?.artist ?? ""} />
                             <div id="edit-song-youTubeId-text-div">You Tube Id: </div>
-                            <input type="text" id="edit-song-youTubeId-text" className="modal-textfield" />
+                            <input type="text" id="edit-song-youTubeId-text" className="modal-textfield" defaultValue={song?.youTubeId ?? ""} />
                         </div>
                         <div className="modal-south">
                             <input type="button" 

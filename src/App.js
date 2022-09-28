@@ -283,7 +283,7 @@ class App extends React.Component {
     }
     markSongForEditing = (index, currentSongProps) => {
         this.setState(prevState => ({
-            currentSongData: {index, currentSongProps}
+            editingSongData: {index, currentSongProps}
         }), () => {
             // PROMPT THE USER
             this.showEditSongModal();
@@ -350,7 +350,7 @@ class App extends React.Component {
                     deleteListCallback={this.deleteMarkedList}
                 />
                 <EditSongModal
-                    // listKeyPair={this.state.listKeyPairMarkedForDeletion}
+                    editingSongData={this.state.editingSongData}
                     hideEditSongModalCallback={this.hideEditSongModal}
                     editSongDataCallback={this.addEditSongTransaction}
                 />
