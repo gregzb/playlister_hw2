@@ -17,10 +17,13 @@ export default class EditSongModal extends Component {
                         <div className="modal-north">
                             Edit Song
                         </div>
-                        <div className="modal-center">
-                            <div className="modal-center-content">
-                                {/* Are you sure you wish to permanently delete the {name} playlist? */}
-                            </div>
+                        <div className="modal-center" id="edit-modal-inputs">
+                            <div id="edit-song-title-text-div">Title: </div>
+                            <input type="text" id="edit-song-title-text" className="modal-textfield" />
+                            <div id="edit-song-artist-text-div">Artist: </div>
+                            <input type="text" id="edit-song-artist-text" className="modal-textfield" />
+                            <div id="edit-song-youTubeId-text-div">You Tube Id: </div>
+                            <input type="text" id="edit-song-youTubeId-text" className="modal-textfield" />
                         </div>
                         <div className="modal-south">
                             <input type="button" 

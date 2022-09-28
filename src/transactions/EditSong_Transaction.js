@@ -22,6 +22,6 @@ export default class EditSong_Transaction extends jsTPS_Transaction {
     }
     
     undoTransaction() {
-        this.app.moveSong(this.editIndex, this.oldSongData);
+        this.app.editSongData(this.editIndex, this.oldSongData);
     }
 }

@@ -241,8 +241,10 @@ input {
 
 .modal-center {
   display: grid;
-  grid-template-columns: 30% 65%;
-  grid-template-rows: 33% 33% 33%;
+  /* grid-template-columns: 30% 65%;
+  grid-template-rows: 33% 33% 33%; */
+  grid-template-columns: 1fr 2fr;
+  grid-template-rows: 1fr 1fr 1fr;
   gap: 10px 20px;
   font-size: 48pt;
 }
@@ -322,6 +324,11 @@ span {
 
 .modal p + p {
   margin-top: 1rem;
+}
+
+#edit-modal-inputs {
+  font-size: 32pt;
+  gap: 10px 10px;
 }
 
 /* ANIMATIONS
