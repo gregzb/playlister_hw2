@@ -236,10 +236,8 @@ class App extends React.Component {
 
     editSongData = (index, newSongData) => {
         let list = this.state.currentList;
-        console.log("EDIT");
-        console.log(list.songs);
+        list.songs[index] = newSongData;
         this.setStateWithUpdatedList(list);
-        this.hideEditSongModal();
     }
 
     // THIS FUNCTION ADDS A MoveSong_Transaction TO THE TRANSACTION STACK
@@ -249,7 +247,7 @@ class App extends React.Component {
     }
 
     addEditSongTransaction = (songIndex, newSongObject) => {
-        const transaction = new EditSong_Transaction(this, songIndex, this.state.currentList[songIndex], newSongObject);
+        const transaction = new EditSong_Transaction(this, songIndex, this.state.currentList.songs[songIndex], newSongObject);
         this.tps.addTransaction(transaction);
     }
 
@@ -283,7 +281,7 @@ class App extends React.Component {
     }
     markSongForEditing = (index, currentSongProps) => {
         this.setState(prevState => ({
-            editingSongData: {index, currentSongProps}
+            currentEditingSongData: {index, currentSongProps}
         }), () => {
             // PROMPT THE USER
             this.showEditSongModal();
@@ -301,14 +299,15 @@ class App extends React.Component {
         modal.classList.remove("is-visible");
     }
 
-    showEditSongModal() {
+    showEditSongModal = () => {
         const modal = document.getElementById("edit-song-modal");
         modal.classList.add("is-visible");
     }
 
-    hideEditSongModal() {
+    hideEditSongModal = () => {
         const modal = document.getElementById("edit-song-modal");
         modal.classList.remove("is-visible");
+        this.setState({currentEditingSongData: undefined});
     }
 
     render() {
@@ -350,7 +349,18 @@ class App extends React.Component {
                     deleteListCallback={this.deleteMarkedList}
                 />
                 <EditSongModal
-                    editingSongData={this.state.editingSongData}
+                    handleFieldChange={(field) => {
+                        return (e) => {
+                            this.setState({currentEditingSongData: {
+                                ...this.state.currentEditingSongData,
+                                currentSongProps: {
+                                    ...this.state.currentEditingSongData.currentSongProps,
+                                    [field]: e.target.value
+                                }
+                            }});
+                        }
+                    }}
+                    editingSongData={this.state.currentEditingSongData}
                     hideEditSongModalCallback={this.hideEditSongModal}
                     editSongDataCallback={this.addEditSongTransaction}
                 />

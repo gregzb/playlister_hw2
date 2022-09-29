@@ -2,13 +2,9 @@ import React, { Component } from 'react';
 
 export default class EditSongModal extends Component {
     render() {
-        // const { listKeyPair, deleteListCallback, hideDeleteListModalCallback } = this.props;
-        // let name = "";
-        // if (listKeyPair) {
-        //     name = listKeyPair.name;
-        // }
-        const {editSongDataCallback, hideEditSongModalCallback, editingSongData} = this.props;
+        const {editSongDataCallback, hideEditSongModalCallback, editingSongData, handleFieldChange} = this.props;
         const {currentSongProps: song, index} = editingSongData ?? {};
+
         return (
             <div 
                 className="modal" 
@@ -18,19 +14,19 @@ export default class EditSongModal extends Component {
                         <div className="modal-north">
                             Edit Song
                         </div>
-                        <div className="modal-center" id="edit-modal-inputs">
+                        <div className="modal-center" id="edit-modal-inputs" key={index}>
                             <div id="edit-song-title-text-div">Title: </div>
-                            <input type="text" id="edit-song-title-text" className="modal-textfield" defaultValue={song?.title ?? ""} />
+                            <input type="text" className="modal-textfield" value={song?.title ?? ""} onChange={handleFieldChange("title")} />
                             <div id="edit-song-artist-text-div">Artist: </div>
-                            <input type="text" id="edit-song-artist-text" className="modal-textfield" defaultValue={song?.artist ?? ""} />
+                            <input type="text" className="modal-textfield" value={song?.artist ?? ""} onChange={handleFieldChange("artist")} />
                             <div id="edit-song-youTubeId-text-div">You Tube Id: </div>
-                            <input type="text" id="edit-song-youTubeId-text" className="modal-textfield" defaultValue={song?.youTubeId ?? ""} />
+                            <input type="text" className="modal-textfield" value={song?.youTubeId ?? ""} onChange={handleFieldChange("youTubeId")} />
                         </div>
                         <div className="modal-south">
                             <input type="button" 
                                 id="edit-song-confirm-button" 
                                 className="modal-button" 
-                                onClick={editSongDataCallback}
+                                onClick={() => {editSongDataCallback(index, {...song}); hideEditSongModalCallback();}}
                                 value='Confirm' />
                             <input type="button" 
                                 id="edit-song-cancel-button" 
