@@ -383,13 +383,21 @@ class App extends React.Component {
         }));
     }
 
+    onKeyPressed = (event) => {
+        if (event.ctrlKey && event.key === 'z') {
+            this.undo();
+        } else if (event.ctrlKey && event.key === 'y') {
+            this.redo();
+        }
+    }
+
     render() {
         let canAddSong = this.state.currentList !== null;
         let canUndo = this.tps.hasTransactionToUndo();
         let canRedo = this.tps.hasTransactionToRedo();
         let canClose = this.state.currentList !== null;
         return (
-            <div id="root">
+            <div id="root" tabIndex={-1} onKeyDown={this.onKeyPressed}>
                 <Banner />
                 <SidebarHeading
                     createNewListCallback={this.createNewList}
