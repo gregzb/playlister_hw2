@@ -310,7 +310,7 @@ class App extends React.Component {
     }
     markSongForEditing = (editIndex, currentSongProps) => {
         this.setState(prevState => ({
-            inListState: {...this.state.inListState, editIndex, currentSongProps}
+                inListState: {...prevState.inListState, editIndex, currentSongProps}
         }), () => {
             // PROMPT THE USER
             this.showEditSongModal();
