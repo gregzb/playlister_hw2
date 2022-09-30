@@ -331,6 +331,10 @@ span {
   gap: 10px 10px;
 }
 
+#delete-song-span {
+  font-weight: bold;
+}
+
 /* ANIMATIONS
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 [data-animation] .modal-root {

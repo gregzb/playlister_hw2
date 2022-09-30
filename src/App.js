@@ -8,10 +8,12 @@ import jsTPS from './common/jsTPS.js';
 // OUR TRANSACTIONS
 import MoveSong_Transaction from './transactions/MoveSong_Transaction.js';
 import EditSong_Transaction from './transactions/EditSong_Transaction.js';
+import DeleteSong_Transaction from './transactions/DeleteSong_Transaction.js';
 
 // THESE REACT COMPONENTS ARE MODALS
 import DeleteListModal from './components/DeleteListModal.js';
 import EditSongModal from './components/EditSongModal.js';
+import DeleteSongModal from './components/DeleteSongModal.js';
 
 // THESE REACT COMPONENTS ARE IN OUR UI
 import Banner from './components/Banner.js';
@@ -79,7 +81,8 @@ class App extends React.Component {
                 nextKey: prevState.sessionData.nextKey + 1,
                 counter: prevState.sessionData.counter + 1,
                 keyNamePairs: updatedPairs
-            }
+            },
+            inListState: {...this.state.inListState, editIndex: undefined, currentSongProps: undefined, deleteIndex: undefined, deleteSong: undefined}
         }), () => {
             // PUTTING THIS NEW LIST IN PERMANENT STORAGE
             // IS AN AFTER EFFECT
@@ -108,6 +111,8 @@ class App extends React.Component {
         if (keyIndex >= 0)
             newKeyNamePairs.splice(keyIndex, 1);
 
+        const newInListState = newCurrentList === null ? {} : {...this.state.inListState}
+
         // AND FROM OUR APP STATE
         this.setState(prevState => ({
             listKeyPairMarkedForDeletion : null,
@@ -116,7 +121,8 @@ class App extends React.Component {
                 nextKey: prevState.sessionData.nextKey,
                 counter: prevState.sessionData.counter - 1,
                 keyNamePairs: newKeyNamePairs
-            }
+            },
+            inListState: newInListState
         }), () => {
             // DELETING THE LIST FROM PERMANENT STORAGE
             // IS AN AFTER EFFECT
@@ -173,33 +179,39 @@ class App extends React.Component {
     // THIS FUNCTION BEGINS THE PROCESS OF LOADING A LIST FOR EDITING
     loadList = (key) => {
         let newCurrentList = this.db.queryGetList(key);
+        this.tps.clearAllTransactions();
         this.setState(prevState => ({
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
             currentList: newCurrentList,
-            sessionData: this.state.sessionData
+            sessionData: this.state.sessionData,
+            inListState: {...this.state.inListState, editIndex: undefined, currentSongProps: undefined, deleteIndex: undefined, deleteSong: undefined}
         }), () => {
             // AN AFTER EFFECT IS THAT WE NEED TO MAKE SURE
             // THE TRANSACTION STACK IS CLEARED
-            this.tps.clearAllTransactions();
+            // this.tps.clearAllTransactions();
         });
     }
     // THIS FUNCTION BEGINS THE PROCESS OF CLOSING THE CURRENT LIST
     closeCurrentList = () => {
+        this.tps.clearAllTransactions();
         this.setState(prevState => ({
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
             currentList: null,
-            sessionData: this.state.sessionData
+            sessionData: this.state.sessionData,
+            inListState: {...this.state.inListState, editIndex: undefined, currentSongProps: undefined, deleteIndex: undefined, deleteSong: undefined}
         }), () => {
             // AN AFTER EFFECT IS THAT WE NEED TO MAKE SURE
             // THE TRANSACTION STACK IS CLEARED
-            this.tps.clearAllTransactions();
+            // this.tps.clearAllTransactions();
         });
     }
-    setStateWithUpdatedList(list) {
+    setStateWithUpdatedList = (list) => {
+        const newObj = list === this.state.currentList ? {...this.state.inListState} : {};
         this.setState(prevState => ({
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
             currentList : list,
-            sessionData : this.state.sessionData
+            sessionData : this.state.sessionData,
+            inListState: newObj
         }), () => {
             // UPDATING THE LIST IN PERMANENT STORAGE
             // IS AN AFTER EFFECT
@@ -240,6 +252,18 @@ class App extends React.Component {
         this.setStateWithUpdatedList(list);
     }
 
+    deleteSongAtIndex = (index) => {
+        let list = this.state.currentList;
+        list.songs.splice(index, 1);
+        this.setStateWithUpdatedList(list);
+    }
+
+    addSongAtIndex = (index, songData) => {
+        let list = this.state.currentList;
+        list.songs.splice(index, 0, songData);
+        this.setStateWithUpdatedList(list);
+    }
+
     // THIS FUNCTION ADDS A MoveSong_Transaction TO THE TRANSACTION STACK
     addMoveSongTransaction = (start, end) => {
         let transaction = new MoveSong_Transaction(this, start, end);
@@ -247,7 +271,12 @@ class App extends React.Component {
     }
 
     addEditSongTransaction = (songIndex, newSongObject) => {
-        const transaction = new EditSong_Transaction(this, songIndex, this.state.currentList.songs[songIndex], newSongObject);
+        const transaction = new EditSong_Transaction(this, songIndex, {...this.state.currentList.songs[songIndex]}, newSongObject);
+        this.tps.addTransaction(transaction);
+    }
+
+    addDeleteSongTransaction = (songIndex) => {
+        const transaction = new DeleteSong_Transaction(this, songIndex, {...this.state.currentList.songs[songIndex]});
         this.tps.addTransaction(transaction);
     }
 
@@ -279,14 +308,25 @@ class App extends React.Component {
             this.showDeleteListModal();
         });
     }
-    markSongForEditing = (index, currentSongProps) => {
+    markSongForEditing = (editIndex, currentSongProps) => {
         this.setState(prevState => ({
-            currentEditingSongData: {index, currentSongProps}
+            inListState: {...this.state.inListState, editIndex, currentSongProps}
         }), () => {
             // PROMPT THE USER
             this.showEditSongModal();
         });
     }
+
+    markSongForDeletion = (deleteIndex) => {
+        const deleteSong = this.state.currentList.songs[deleteIndex];
+        this.setState(prevState => ({
+            inListState: {...this.state.inListState, deleteIndex, deleteSong}
+        }), () => {
+            // PROMPT THE USER
+            this.showDeleteSongModal();
+        });
+    }
+
     // THIS FUNCTION SHOWS THE MODAL FOR PROMPTING THE USER
     // TO SEE IF THEY REALLY WANT TO DELETE THE LIST
     showDeleteListModal() {
@@ -307,7 +347,22 @@ class App extends React.Component {
     hideEditSongModal = () => {
         const modal = document.getElementById("edit-song-modal");
         modal.classList.remove("is-visible");
-        this.setState({currentEditingSongData: undefined});
+        this.setState(prevState => ({
+            inListState: {...this.state.inListState, editIndex: undefined, currentSongProps: undefined}
+        }));
+    }
+
+    showDeleteSongModal = () => {
+        const modal = document.getElementById("delete-song-modal");
+        modal.classList.add("is-visible");
+    }
+
+    hideDeleteSongModal = () => {
+        const modal = document.getElementById("delete-song-modal");
+        modal.classList.remove("is-visible");
+        this.setState(prevState => ({
+            inListState: {...this.state.inListState, deleteIndex: undefined, deleteSong: undefined}
+        }));
     }
 
     render() {
@@ -341,7 +396,8 @@ class App extends React.Component {
                 <PlaylistCards
                     currentList={this.state.currentList}
                     moveSongCallback={this.addMoveSongTransaction}
-                    editSongCallback={this.markSongForEditing} />
+                    editSongCallback={this.markSongForEditing}
+                    deleteSongCallback={this.markSongForDeletion} />
                 <Statusbar 
                     currentList={this.state.currentList} />
                 <DeleteListModal
@@ -352,18 +408,23 @@ class App extends React.Component {
                 <EditSongModal
                     handleFieldChange={(field) => {
                         return (e) => {
-                            this.setState({currentEditingSongData: {
-                                ...this.state.currentEditingSongData,
+                            this.setState({inListState: {
+                                ...this.state.inListState,
                                 currentSongProps: {
-                                    ...this.state.currentEditingSongData.currentSongProps,
+                                    ...this.state.inListState.currentSongProps,
                                     [field]: e.target.value
                                 }
                             }});
                         }
                     }}
-                    editingSongData={this.state.currentEditingSongData}
+                    editingSongData={this.state.inListState}
                     hideEditSongModalCallback={this.hideEditSongModal}
                     editSongDataCallback={this.addEditSongTransaction}
+                />
+                <DeleteSongModal
+                    deletingSongData={this.state.inListState}
+                    hideDeleteSongModalCallback={this.hideDeleteSongModal}
+                    deleteSongCallback={this.addDeleteSongTransaction}
                 />
             </div>
         );
