@@ -386,8 +386,10 @@ class App extends React.Component {
     onKeyPressed = (event) => {
         if (event.ctrlKey && event.key === 'z') {
             this.undo();
+            this.setState(prevState => ({}));
         } else if (event.ctrlKey && event.key === 'y') {
             this.redo();
+            this.setState(prevState => ({}));
         }
     }
 
@@ -396,8 +398,12 @@ class App extends React.Component {
         let canUndo = this.tps.hasTransactionToUndo();
         let canRedo = this.tps.hasTransactionToRedo();
         let canClose = this.state.currentList !== null;
+
+        document.removeEventListener('keydown', this.onKeyPressed);
+        document.addEventListener('keydown', this.onKeyPressed);
+        
         return (
-            <div id="root" tabIndex={-1} onKeyDown={this.onKeyPressed}>
+            <div id="root" >
                 <Banner />
                 <SidebarHeading
                     createNewListCallback={this.createNewList}
